@@ -5,10 +5,18 @@ import (
 	"time"
 )
 
-func TestTransactions(t *testing.T) {
-	previous := transactions
+func resetLedger(t *testing.T) {
+	t.Helper()
+	previousTransactions, previousBudgets := transactions, budgets
 	transactions = make([]Transaction, 0)
-	t.Cleanup(func() { transactions = previous })
+	budgets = make(map[string]Budget)
+	t.Cleanup(func() {
+		transactions, budgets = previousTransactions, previousBudgets
+	})
+}
+
+func TestTransactions(t *testing.T) {
+	resetLedger(t)
 
 	if got := ListTransactions(); len(got) != 0 {
 		t.Fatalf("initial transactions = %v, want empty storage", got)
